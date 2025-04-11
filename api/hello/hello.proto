@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package api.hello;
+
+option go_package = "kratos-template/api/hello;hello_api";
+
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloReply {
+  int32 code = 1;
+  string message = 2;
+}
+
