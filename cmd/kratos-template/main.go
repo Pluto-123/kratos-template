@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/go-kratos/kratos/v2/transport"
+	"kratos-template/internal/server"
 	"os"
 
 	"kratos-template/internal/conf"
@@ -34,12 +35,13 @@ func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs/config.yaml", "config path, eg: -conf config.yaml")
 }
 
-func newApp(logger log.Logger, gs *grpc.Server, hss []*http.Server) *kratos.App {
+func newApp(logger log.Logger, gs *grpc.Server, cw *server.CronWorker, hss []*http.Server) *kratos.App {
 	servers := make([]transport.Server, 0)
 	for _, v := range hss {
 		servers = append(servers, v)
 	}
 	servers = append(servers, gs)
+	servers = append(servers, cw)
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
@@ -79,7 +81,7 @@ func main() {
 		panic(err)
 	}
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, logger)
+	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Job, logger)
 	if err != nil {
 		panic(err)
 	}
